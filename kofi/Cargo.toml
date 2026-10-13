@@ -1,0 +1,18 @@
+[package]
+name = "theater_api_kofi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+theater_api_common.workspace = true
+theater_shared.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+reqwest.workspace = true
+parking_lot.workspace = true
+egui.workspace = true

@@ -1,0 +1,21 @@
+[package]
+name = "theater_api_common"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# What the Theater API plugins share: being an OBS plugin (exports, logs,
+# settings folder), their 🎭 Theater menu item and window, the browser
+# login, and the Control Panel modules' proxies.
+[dependencies]
+theater_shared.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+reqwest.workspace = true
+rustls.workspace = true
+parking_lot.workspace = true
+image.workspace = true
+egui.workspace = true
+eframe.workspace = true
+winit.workspace = true
