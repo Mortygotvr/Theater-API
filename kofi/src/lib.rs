@@ -43,20 +43,17 @@ pub struct Settings {
     /// The trigger's channel: "Kofi <page> donation"
     pub page: String,
     pub poll_seconds: u64,
-    /// The proxy's address (the kofi module's, unless you run your own)
-    pub relay_url: String,
 }
 
 impl Default for Settings {
     fn default() -> Self {
-        Settings { verification_token: String::new(), page: "kofi".into(), poll_seconds: 5, relay_url: String::new() }
+        Settings { verification_token: String::new(), page: "kofi".into(), poll_seconds: 5 }
     }
 }
 
 impl Settings {
     pub fn url(&self) -> String {
-        let url = self.relay_url.trim();
-        if url.is_empty() { theater_api_common::proxies::KOFI.to_string() } else { url.to_string() }
+        theater_api_common::proxies::KOFI.to_string()
     }
     pub fn page(&self) -> String {
         let page: String = self.page.split_whitespace().collect::<Vec<_>>().join("");
@@ -137,7 +134,7 @@ async fn poll_loop(s: Settings) {
     let token = s.verification_token.trim().to_string();
     let page = s.page();
     let url = s.url();
-    theater_api_common::log(&format!("☕ Asking the Ko-fi proxy every {} s", s.poll_seconds.max(3)));
+    theater_api_common::log(&format!("☕ Checking Ko-fi every {} s", s.poll_seconds.max(3)));
     loop {
         let sep = if url.contains('?') { '&' } else { '?' };
         let ask = format!("{url}{sep}action=poll&token={}&t={}", token, theater_api_common::unix_secs());
@@ -153,9 +150,9 @@ async fn poll_loop(s: Settings) {
                         handle(&events::unwrap(&item), &token, &page);
                     }
                 }
-                _ => with(|st| st.last_error = "the proxy answered something else (is the address right?)".into()),
+                _ => with(|st| st.last_error = "Ko-fi's webhook relay answered something unexpected: try again later".into()),
             },
-            Err(e) => with(|st| st.last_error = format!("couldn't reach the proxy: {e}")),
+            Err(e) => with(|st| st.last_error = format!("couldn't reach Ko-fi's webhook relay: {e}")),
         }
         theater_api_common::window::repaint();
         tokio::time::sleep(Duration::from_secs(s.poll_seconds.max(3))).await;

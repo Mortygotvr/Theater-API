@@ -1,5 +1,5 @@
-//! The "☕ Ko-fi API" window: the verification token and page, the proxy's
-//! state, tests, and the last supporters.
+//! The "☕ Ko-fi API" window: the verification token and page, the
+//! connection's state, tests, and the last supporters.
 
 use egui::RichText;
 use parking_lot::Mutex;
@@ -24,9 +24,6 @@ pub fn ui(ui: &mut egui::Ui) {
         ui.end_row();
         ui.label("Ask every (s)");
         ui.add(egui::DragValue::new(&mut draft.poll_seconds).range(3..=120));
-        ui.end_row();
-        ui.label("Proxy address");
-        ui.add(egui::TextEdit::singleline(&mut draft.relay_url).hint_text("the Control Panel module's (leave empty)").desired_width(280.0));
         ui.end_row();
     });
     ui.horizontal_wrapped(|ui| {
@@ -64,12 +61,8 @@ pub fn ui(ui: &mut egui::Ui) {
     } else if !last_error.is_empty() {
         ui.colored_label(bad_color(), last_error);
     } else {
-        ui.colored_label(ok_color(), format!("Asking the proxy · {events} event(s) since OBS started"));
+        ui.colored_label(ok_color(), format!("Checking Ko-fi · {events} event(s) since OBS started"));
     }
-    ui.colored_label(
-        wait_color(),
-        "If the Control Panel's Ko-fi module asks the proxy too, the two take turns getting each donation: an updated Control Panel leaves it to this plugin.",
-    );
     ui.add_space(8.0);
 
     ui.label(RichText::new("Test").strong());
@@ -97,6 +90,6 @@ pub fn ui(ui: &mut egui::Ui) {
     }
 }
 
-fn draft_key(s: &crate::Settings) -> (String, String, u64, String) {
-    (s.verification_token.clone(), s.page.clone(), s.poll_seconds, s.relay_url.clone())
+fn draft_key(s: &crate::Settings) -> (String, String, u64) {
+    (s.verification_token.clone(), s.page.clone(), s.poll_seconds)
 }
