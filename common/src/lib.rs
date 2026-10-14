@@ -120,9 +120,10 @@ pub fn init(info: &'static Info) {
     let _ = rustls::crypto::ring::default_provider().install_default();
 }
 
-/// Its relay role, with what connected apps send (None: not wanted)
+/// Its relay role: a guest, never holding the port (a Reader's, Theater
+/// Reader's plugin or app), with what connected apps send (None: not wanted)
 pub fn start_relay(on_app: Option<fn(&str)>) -> theater_shared::relay::Role {
-    theater_shared::relay::start(info().name, theater_shared::relay::DEFAULT_PORT, false, runtime().handle(), log, on_app)
+    theater_shared::relay::start_guest(info().name, log, on_app)
 }
 
 /// Panics in its threads otherwise vanish (OBS has no console on Windows)

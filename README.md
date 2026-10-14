@@ -8,13 +8,15 @@ One OBS plugin per service, each installed or not, on its own:
 | **Theater API · Patreon** (`theater-api-patreon`) | New, changed and ended pledges, and your patrons by tier | `Patreon <name> pledge <tier>`, `… pledge change`, `… pledge end` |
 | **Theater API · Ko-fi** (`theater-api-kofi`) | Donations, memberships, shop orders, commissions | `Kofi <page> donation`, `… subscription`, `… shop order`, `… commission` |
 
-Each one sends its alerts through the relay (`ws://127.0.0.1:41837`) in Theater's shared alert shape (`theater_shared::alert`), plus the trigger feed. Theater Scene, the Control Panel and the Rhai alert scripts get them like Theater Reader's.
+Each one sends its alerts in Theater's shared alert shape (`theater_shared::alert`), with their triggers. Theater Scene (its triggers and the Rhai alert scripts) and the Control Panel get them like Theater Reader's.
 
 ## Working together
 
-- **The relay** belongs to whichever Theater plugin starts first (`theater_shared::relay`). The others send through it. Each plugin therefore works with or without Theater Reader and the other plugins.
-- **With Theater Reader too,** Reader leaves a channel's Twitch alerts to Theater API · Twitch while it's connected (`theater_api_twitch_channels`), so no alert comes twice.
-- **The Control Panel** reads everything once, from the `theater_event` OBS signal. Its Ko-fi module stops asking the Ko-fi proxy when Theater API · Ko-fi is installed, because the proxy's queue empties on each read.
+- **One Reader at a time, the API plugins always.** The relay's port (`ws://127.0.0.1:41837`) is a Reader's: the Theater Reader plugin's or the Theater Reader app's. The API plugins never take it (`theater_shared::relay::start_guest`), so each works with either Reader, or none, and the other API plugins.
+  - **With the Theater Reader plugin,** they send through it (`theater_relay_send`): everything on its port, and once on the `theater_event` OBS signal.
+  - **Otherwise** (the Theater Reader app, or no Reader), they send on `theater_event` only. Theater Scene and the Control Panel listen to it inside OBS.
+- **No Twitch alert twice.** While Theater API · Twitch is connected to a channel (`theater_api_twitch_channels`), the Theater Reader plugin leaves that channel's Twitch alerts to it. With the Theater Reader app, Theater Scene and the Control Panel leave out the app's Twitch alerts for that channel.
+- **The Control Panel's** Ko-fi module stops asking the Ko-fi proxy when Theater API · Ko-fi is installed, because the proxy's queue empties on each read.
 
 ## Logins
 

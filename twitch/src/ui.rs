@@ -77,13 +77,8 @@ pub fn ui(ui: &mut egui::Ui) {
         ui.colored_label(wait_color(), format!("Twitch won't send {topic}: {why}"));
     }
     let relay = theater_shared::relay::status();
-    let relay_text = match &relay.role {
-        theater_shared::relay::Role::Host if relay.up => format!("Relay: ws://127.0.0.1:{} (hosted here) · {} app(s)", relay.port, relay.apps),
-        theater_shared::relay::Role::Host => format!("Relay: starting… {}", relay.problem.clone().unwrap_or_default()),
-        role => format!("Relay: through {}", theater_shared::relay::role_name(role)),
-    };
-    ui.weak(relay_text);
-    ui.weak("With Theater Reader too, Reader leaves this channel's Twitch alerts to this plugin, so they don't come twice.");
+    ui.weak(format!("Alerts go through {}", theater_shared::relay::role_name(&relay.role)));
+    ui.weak("With Theater Reader too (its plugin or app), this channel's Twitch alerts come from this plugin only, so they don't come twice.");
     ui.add_space(8.0);
 
     // Tests
